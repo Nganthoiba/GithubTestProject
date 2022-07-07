@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+
+<link rel="shortcut icon" href="images/logo.png">
+
+<title>NICDSign Demo Home</title>
+
+<!-- Bootstrap core CSS -->
+<link href="resources/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".navbar-collapse">
+					<span class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">NICDSign Demo</a>
+			</div>
+			<!--/.navbar-collapse -->
+		</div>
+	</div>
+
+	<!-- Main jumbotron for a primary marketing message or call to action -->
+	<div class="jumbotron">
+		<div class="container">
+			<h1>NICDSign</h1>
+			<h4>The DSC Signing Solution</h4>
+			<p>NICDSign provides PKCS#11 token based DSC sigining and
+				verification capabilities to clients</p>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-4">
+				<h2>DSC Registration</h2>
+				<p>DSC Registration Demo.</p>
+				<p>
+					<a class="btn btn-default" target="_blank" href="RegisterDSC.html">View
+						Demo &raquo;</a>
+				</p>
+			</div>
+			<div class="col-lg-4">
+				<h2>Data Signing</h2>
+				<p>Data Signing to generate detached pkcs#7 signature.</p>
+				<p>
+					<!--<a class="btn btn-default" target="_blank" href="SignData.html">View
+						Demo &raquo;</a> -->
+						<a class="btn btn-default" target="_blank"
+						href="SignDataRegCert.html">View Demo &raquo;</a>
+				</p>
+			</div>
+			<div class="col-lg-4">
+				<h2>Pdf Signing : Digital Signature Stamping</h2>
+				<p>Non Stamping mode Pdf Signing.</p>
+				<p>
+						<a class="btn btn-default" target="_blank"
+						href="SignPdfNoStampingV2.html">View Demo (Self Sign)</a>
+						<a
+						class="btn btn-default" target="_blank"
+						href="SignPdfNoStampingRegCert.html">View Demo &raquo;</a>
+						<a class="btn btn-default" target="_blank"
+						href="SignPdfNoStampingV3.html">View Demo (Custom Page Sign)</a>
+				</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-4">
+				<h2>Pdf Signing : Wet ink signature stamping</h2>
+				<p>Stamping Mode Pdf Signing. Allow stamping on all pages or
+					last page</p>
+				<p>
+					<a class="btn btn-default" target="_blank"
+						href="SignPdfStamping.html">View Demo &raquo;</a>
+				</p>
+			</div>
+			
+			<div class="col-lg-4">
+				<h2>Batch PDF Signing</h2>
+				<p>Create a batch with a predefined size and sign PDF files continuously with only one time PIN prompt</p>
+				<p>
+					<a class="btn btn-default" target="_blank"
+						href="PDFBatchTest.html">View Demo &raquo;</a>
+				</p>
+			</div>
+
+			<div class="col-lg-4">
+				<h2>XML Signing</h2>
+				<p>Signing of XML Data</p>
+				<p>
+				<!--	<a class="btn btn-default" target="_blank" href="SignXML.html">View
+						Demo &raquo;</a> -->
+						<a class="btn btn-default" target="_blank"
+						href="SignXMLRegCert.html">View Demo &raquo;</a>
+				</p>
+			</div>
+		</div>
+
+		<hr>
+
+		<footer>
+			<p>&copy; NICDSign 2018</p>
+		</footer>
+	</div>
+
+	<script src="resources/js/jquery.js"></script>
+	<script src="resources/js/bootstrap.min.js"></script>
+</body>
+</html>

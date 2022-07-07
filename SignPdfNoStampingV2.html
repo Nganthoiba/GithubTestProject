@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Sign Pdf Demo With Self Sign - No Stamping</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="resources/js/jquery.js"></script>
+<script src="resources/js/bootstrap.min.js"></script>
+<script src="resources/js/dsc-signer.js" type="text/javascript"></script>
+<script src="resources/js/dscapi-conf.js" type="text/javascript"></script>
+<link type="text/css" rel="stylesheet"
+	href="resources/css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="resources/css/dsc-signer.css">
+</head>
+<body>
+	<h1>Sign Pdf Demo With Self Sign - No Stamping</h1>
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="well-sm">
+				<form id="pdfForm">
+					<label for="data">Choose Local File : </label><br /> <input
+						type="file" name="pdfFile" id="pdfFile" accept="application/pdf" />
+					<label for="pdfData">Pdf Data(Base64)):</label> <br />
+					<textarea id="pdfData" 
+					placeholder="Choose pdf file above to show pdf data..."
+					cols="60" rows="4" readonly="readonly"></textarea>
+					<br /> Reason : <input type="text" id="signingReason"
+						name="signingReason" maxlength="20" /> <br />Location : <input
+						type="text" id="signingLocation" name="signingLocation"
+						maxlength="20" /> <br /> stampingX : <input type="text"
+						id="stampingX" name="stampingX" maxlength="20" value="200" /> <br />stampingY
+					: <input type="text" id="stampingY" name="stampingY" maxlength="20"
+						value="200" /><br />Select TSA URL : <select name="tsaurls"
+						id="tsaurls" onchange="myFunction()">
+						<option value="0">--------------------------SELECT---------------------------------</option>
+						<option
+							value="http://sha256timestamp.ws.symantec.com/sha256/timestamp">
+							http://sha256timestamp.ws.symantec.com/sha256/timestamp</option>
+						<option value="http://timestamp.comodoca.com/rfc3161">http://timestamp.comodoca.com/rfc3161</option>
+						<option value="http://tsa.startssl.com/rfc3161">http://tsa.startssl.com/rfc3161</option>
+						<option value="http://timestamp.digicert.com">http://timestamp.digicert.com</option>
+						<option value="http://tsa.safecreative.org">http://tsa.safecreative.org</option>
+					</select> <br /> TSA URL (Optional) : <input type="text" id="tsaURL"
+						name="tsaURL" value="" maxlength="100" style="width: 400px;" /> <br />Time
+					Server URL (Optional) : <input type="text" id="timeServerURL"
+						name="timeServerURL"
+						value="http://localhost:8080/dscapi/getServerTime" maxlength="100"
+						style="width: 400px;" /><br /> <span style="color: red;">If
+						the time server URL is not provided, the client time will be used
+						for signing.</span> <br /> <input id="signPdf" type="button"
+						value=" Sign Pdf " class="btn btn-success"> <input
+						id="submitPdf" type="Submit" style="display: none;"> <a
+						id="downloadDiv" href='#' type="application/pdf"
+						download="SignedPdf.pdf"></a> <input id="btnDecryptVerify"
+						type="button" value=" Decrypt Verify " class="btn btn-danger" />
+					<input id="btnDecryptVerifyWithCrt" type="button"
+						value=" Decrypt & Verify " class="btn btn-danger" />
+				</form>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="well-sm">
+				<label for="signedPdfData">Signed Pdf Data(Base64):</label> <br />
+				<textarea
+				placeholder="After signing, the encrypted signature will be shown here..."
+				id="signedPdfData" cols="60" rows="8" disabled></textarea>
+			</div>
+		</div>
+	</div>
+	<div id="panel"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+			function myFunction() {
+				var x = document.getElementById("tsaurls").value;
+				if (x != 0) {
+					document.getElementById("tsaURL").value = x;
+				} else {
+					document.getElementById("tsaURL").value = "";
+				}
+			}
+			
+
+			$('#btnDecryptVerify').hide();
+			$('#btnDecryptVerifyWithCrt').hide();
+
+			var initConfig = {
+				"preSignCallback" : function() {
+					// do something 
+					// based on the return sign will be invoked
+					return true;
+				},
+				"postSignCallback" : function(alias, sign) {
+					$('#signedPdfData').val(sign);
+					
+					//Set Class to download link
+					$('#downloadDiv').addClass('btn btn-info');
+					//get pdf data
+					var pdfData = sign;
+					var dlnk = document.getElementById('downloadDiv');
+					dlnk.href = 'data:application/pdf;base64,' + pdfData;
+					$("#downloadDiv").text("Download Signed PDF File");
+
+				},
+				signType : 'pdf',
+				mode : 'nostampingnoencryptionv2',
+				certificateData : $('#cert').val()
+			//"certificateSno" : 13705892,
+			};
+			dscSigner.configure(initConfig);
+
+			$('#cert').bind('input propertychange', function() {
+				var initConfig = {
+					"preSignCallback" : function() {
+						// do something before signing
+						alert("Pre-sign event fired");
+						return true;
+					},
+					"postSignCallback" : function(alias, sign) {
+						//do something after signing
+						$('#signedPdfData').val(sign);
+						
+						//Set Class to download link
+						$('#downloadDiv').addClass('btn btn-info');
+						//get pdf data
+						var pdfData = sign;
+						var dlnk = document.getElementById('downloadDiv');
+						dlnk.href = 'data:application/pdf;base64,' + pdfData;
+						$("#downloadDiv").text("Download Signed PDF File");
+
+					},
+					signType : 'pdf',
+					mode : 'nostampingnoencryptionv2',
+					certificateData : $('#cert').val()
+				//Set the cerificate serial number to skip certificate selection
+				//"certificateSno" : 13705892,
+				};
+				dscSigner.configure(initConfig);
+			});
+
+			$('#signPdf').click(function() {
+				
+				var data = $("#pdfData").val();
+
+				if (data != null || data != '') {
+					dscSigner.sign(data);
+				}
+			});
+
+			function readURL(input) {
+				if (input.files && input.files[0]) {
+					var reader = new FileReader();
+
+					reader.onload = function(e) {
+						var data = e.target.result;
+						var base64 = data.replace(/^[^,]*,/, '');
+						$("#pdfData").val(base64);
+					}
+
+					reader.readAsDataURL(input.files[0]);
+				}
+			}
+
+			$("#pdfFile").change(function() {
+				readURL(this);
+			});
+
+		});
+	</script>
+</body>
+</html>

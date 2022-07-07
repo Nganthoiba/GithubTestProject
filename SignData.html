@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Data Signing Demo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="resources/js/jquery.js"></script>
+<script src="resources/js/bootstrap.min.js"></script>
+<script src="resources/js/dsc-signer.js" type="text/javascript"></script>
+<script src="resources/js/dscapi-conf.js" type="text/javascript"></script>
+<link type="text/css" rel="stylesheet"
+	href="resources/css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="resources/css/dsc-signer.css">
+</head>
+<body>
+	<h1>Data Signing Demo</h1>
+	<div class="row">
+		<div class="col-md-6">
+			<div>
+				<form id="form">
+					<label for="data">Data to Sign:</label><br />
+					<textarea id="data" cols="60" rows="8" required></textarea>
+					<br /> <input id="btnSign" type="button" value=" Sign "
+						class="btn btn-success" /> <input id="btnVerify" type="button"
+						value=" Verify " class="btn btn-danger" /> <br /> <label
+						for="lblSignature">Signature[Encrypted]:</label> <br />
+					<textarea id="lblSignature" cols="60" rows="8" disabled></textarea>
+					<br /> <label for="lblEncryptedKey">Encryption Key:</label> <br />
+					<textarea id="lblEncryptedKey" cols="60" rows="4" disabled></textarea>
+				</form>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<label for="decryptedSignature">Decrypted Signature:</label> <br />
+			<textarea id="decryptedSignature" cols="60" rows="8" disabled></textarea>
+			<br /> <label for="verifiedSignature">Verification
+				Result:</label> <br />
+			<textarea id="verifiedSignature" cols="60" rows="8" disabled></textarea>
+		</div>
+	</div>
+	<div id="panel"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			$('#btnVerify').hide();
+
+			var initConfig = {
+				"preSignCallback" : function() {
+					// do something before signing
+					alert("Pre-sign event fired");
+					return true;
+				},
+				"postSignCallback" : function(alias, sign, key) {
+					//do something after signing
+					$('#lblSignature').val(sign);
+					$('#lblEncryptedKey').val(key);
+
+					// Implement Decrypt here
+					var requestData = {
+						action : "DECRYPT",
+						en_sig : sign,
+						ek : key
+					};
+					$.ajax({
+						url : dscapibaseurl + "/signature",
+						type : "post",
+						dataType : "json",
+						contentType : 'application/json',
+						data : JSON.stringify(requestData),
+						async : false
+					}).done(function(data) {
+						if (data.status_cd == 1) {
+							$('#decryptedSignature').val(atob(data.data));
+							$('#btnVerify').show();
+						} else {
+							alert("Decryption Failed");
+						}
+
+					}).fail(function(jqXHR, textStatus, errorThrown) {
+						alert(textStatus);
+					});
+
+				},
+				signType : 'data'
+
+			//Set the cerificate serial number to skip certificate selection
+			//"certificateSno" : 13705892,
+			};
+			dscSigner.configure(initConfig);
+
+			$('#btnSign').click(function() {
+				var data = $("#data").val();
+				if (data != null || data != '') {
+					dscSigner.sign(data);
+				}
+			});
+
+			$('#btnVerify').click(function() {
+				var jsonObj = JSON.parse($('#decryptedSignature').val());
+				
+				try {
+		    		var data = btoa($('#data').val());
+		    	}
+		    	catch(err) {
+		    		var data = utoa($('#data').val());
+		    	}
+
+				// Implement Verify here
+				var requestData = {
+					action : "VERIFY",
+					pkcs7_sig : jsonObj.sig,
+					data : data
+				};
+				$.ajax({
+					url : dscapibaseurl + "/signature",
+					type : "post",
+					dataType : "json",
+					contentType : 'application/json',
+					data : JSON.stringify(requestData),
+					async : false
+				}).done(function(data) {
+					if (data.status_cd == 1) {
+						$('#verifiedSignature').val(atob(data.data));
+					} else {
+						alert("Verification Failed");
+					}
+
+				}).fail(function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus);
+				});
+			});
+			
+			// ucs-2 string to base64 encoded ascii
+		    function utoa(str) {
+		        return window.btoa(unescape(encodeURIComponent(str)));
+		    }
+		    // base64 encoded ascii to ucs-2 string
+		    function atou(str) {
+		        return decodeURIComponent(escape(window.atob(str)));
+		    }
+
+		});
+	</script>
+</body>
+</html>
